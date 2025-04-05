@@ -4,26 +4,36 @@ import Textarea from '@/shared/components/ui/textarea/Textarea.vue'
 import { Copy } from 'lucide-vue-next'
 import { ref } from 'vue'
 
-const emits = defineEmits(['wrongText'])
+// emiting new text
+defineEmits(['newText'])
 
-const wrongText = ref('')
+const inputText = ref('')
+
+// getting translated text
+defineProps({
+	translatedText: String,
+})
 </script>
 
 <template>
-	<form class="flex items-center justify-between mt-3 border rounded-xl">
-		<div class="w-[50%]">
+	<form
+		class="flex items-center justify-between mt-3 border rounded-xl max-sm:flex-col"
+	>
+		<div class="w-[50%] max-sm:w-full">
 			<Textarea
+				v-model="inputText"
 				placeholder="Enter your wrong text"
-				v-model="wrongText"
-				class="h-[500px] text-xl flex items-start leading-none pt-2 border-l-0 border-t-0 border-b-0 shadow-none rounded-s-xl rounded-e-none"
-				@input="$emit('wrongText', wrongText)"
+				class="h-[500px] max-sm:h-[200px] text-xl flex items-start leading-none pt-2 border-l-0 border-t-0 border-b-0 shadow-none rounded-s-xl rounded-e-none max-sm:rounded-t-xl max-sm:border-b max-sm:border-r-0 max-sm:rounded-b-none"
+				@input="$emit('newText', inputText)"
 			>
 			</Textarea>
 		</div>
-		<div class="w-[50%] relative group duration-300">
+		<div class="w-[50%] relative group duration-300 max-sm:w-full">
 			<Textarea
 				placeholder="And take a correct one!"
-				class="h-[500px] text-xl flex items-start leading-none pt-2 border-l-0 border-t-0 border-b-0 shadow-none rounded-e-xl rounded-s-none"
+				class="h-[500px] max-sm:h-[200px] text-xl flex items-start leading-none pt-2 border-l-0 border-t-0 border-b-0 shadow-none rounded-e-xl rounded-s-none max-sm:rounded-t-none max-sm:rounded-b-xl max-sm:border-r-0"
+				:model-value="translatedText"
+				readonly
 			>
 			</Textarea>
 			<Button
