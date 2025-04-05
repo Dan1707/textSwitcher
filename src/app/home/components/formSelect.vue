@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ArrowRightLeft } from 'lucide-vue-next'
 import Button from '@/shared/components/ui/button/Button.vue'
-import { onBeforeMount, onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { supabase } from '@/shared/lib/supabase'
