@@ -7,6 +7,7 @@ import 'vue3-toastify/dist/index.css'
 import { supabase } from '@/shared/lib/supabase'
 import FormSelectItem from './formSelectItem.vue'
 import { useHomeStore } from '../store/store'
+import { useTranslateKeyboard } from '../composables/translateText'
 
 const store = useHomeStore()
 
@@ -15,18 +16,39 @@ const correctLang = ref('')
 
 const isChanged = ref(false)
 
-// changing languages
-const changeLang = () => {
-	const wrongLangCopy = wrongLang.value
-	const correctLangCopy = correctLang.value
+const props = defineProps({
+	translatedText: String,
+})
 
-	wrongLang.value = correctLangCopy
-	correctLang.value = wrongLangCopy
+// --- LocalStorage Keys ---
+const WRONG_LANG_KEY = 'keyboard_wrong_lang'
+const CORRECT_LANG_KEY = 'keyboard_correct_lang'
 
-	isChanged.value = !isChanged.value
-}
+// --- Load from localStorage on mount ---
+onBeforeMount(() => {
+	// fetch languages first
+	fetchLang()
 
-// watching languages to not make them the same
+	// Load saved languages
+	const savedWrong = localStorage.getItem(WRONG_LANG_KEY)
+	const savedCorrect = localStorage.getItem(CORRECT_LANG_KEY)
+
+	if (savedWrong) wrongLang.value = savedWrong
+	if (savedCorrect) correctLang.value = savedCorrect
+})
+
+// --- Save to localStorage whenever languages change ---
+watch(wrongLang, newVal => {
+	store.fromLayout = newVal
+	localStorage.setItem(WRONG_LANG_KEY, newVal)
+})
+
+watch(correctLang, newVal => {
+	store.toLayout = newVal
+	localStorage.setItem(CORRECT_LANG_KEY, newVal)
+})
+
+// --- Prevent same languages ---
 watch([wrongLang, correctLang], () => {
 	if (
 		wrongLang.value &&
@@ -42,16 +64,20 @@ watch([wrongLang, correctLang], () => {
 	}
 })
 
-watch(wrongLang, newVal => {
-	store.fromLayout = newVal
-})
+// --- Language switch ---
+const changeLang = () => {
+	const wrongLangCopy = wrongLang.value
+	const correctLangCopy = correctLang.value
 
-watch(correctLang, newVal => {
-	store.toLayout = newVal
-})
+	wrongLang.value = correctLangCopy
+	correctLang.value = wrongLangCopy
 
-// fetch languages
-const langArr = ref([])
+	isChanged.value = !isChanged.value
+	useTranslateKeyboard(props.translatedText || '')
+}
+
+// --- Fetch language list from DB ---
+const langArr = ref<string[]>([])
 
 const fetchLang = async () => {
 	try {
@@ -60,16 +86,12 @@ const fetchLang = async () => {
 			throw error
 		} else {
 			langArr.value = data
-			console.log(langArr.value)
+			console.log('Languages loaded:', langArr.value)
 		}
 	} catch (error) {
 		console.log(error)
 	}
 }
-
-onBeforeMount(() => {
-	fetchLang()
-})
 </script>
 
 <template>

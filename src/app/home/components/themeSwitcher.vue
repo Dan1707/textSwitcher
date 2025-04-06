@@ -1,16 +1,37 @@
 <script lang="ts" setup>
 import { Moon, Sun } from 'lucide-vue-next'
 import Button from '@/shared/components/ui/button/Button.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
-const switchTheme = ref(true)
+const THEME_KEY = 'theme'
+
+const switchTheme = ref(true) // true = light (Sun), false = dark (Moon)
 
 const toggleTheme = () => {
 	const page = document.querySelector('html')
-
 	switchTheme.value = !switchTheme.value
-	page?.classList.toggle('dark')
+
+	if (switchTheme.value) {
+		page?.classList.remove('dark')
+		localStorage.setItem(THEME_KEY, 'light')
+	} else {
+		page?.classList.add('dark')
+		localStorage.setItem(THEME_KEY, 'dark')
+	}
 }
+
+onMounted(() => {
+	const savedTheme = localStorage.getItem(THEME_KEY)
+	const page = document.querySelector('html')
+
+	if (savedTheme === 'dark') {
+		switchTheme.value = false
+		page?.classList.add('dark')
+	} else {
+		switchTheme.value = true
+		page?.classList.remove('dark')
+	}
+})
 </script>
 
 <template>
