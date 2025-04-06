@@ -54,6 +54,7 @@ const translateKeyboard = async (inputText: string) => {
 			<FormFields
 				@newText="translateKeyboard"
 				:translatedText="translatedText"
+				:isLoading="isLoading"
 			/>
 		</div>
 	</div>
